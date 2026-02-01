@@ -16,7 +16,6 @@
         overflow: hidden;
     }
 
-    /* Floating hearts */
     .heart {
         position: fixed;
         color: rgba(255, 0, 76, 0.4);
@@ -29,14 +28,15 @@
         100% { transform: translateY(-120vh) scale(1.6); opacity: 0; }
     }
 
-    /* Main box */
     .main-box {
         background: white;
-        padding: 45px 55px;
+        padding: 60px 70px; /* increased size */
         border-radius: 25px;
         box-shadow: 0 8px 25px rgba(0,0,0,0.18);
         text-align: center;
         max-width: 95%;
+        position: relative;
+        z-index: 10;
     }
 
     .emoji {
@@ -61,7 +61,6 @@
         position: relative;
     }
 
-    /* YES button with bouncing animation */
     #yesBtn {
         background: #ff4b8b;
         color: white;
@@ -69,6 +68,7 @@
         padding: 18px 45px;
         box-shadow: 0 6px 20px rgba(255, 75, 139, 0.4);
         animation: bounce 1.2s infinite ease-in-out;
+        z-index: 9999;
     }
 
     @keyframes bounce {
@@ -81,6 +81,9 @@
         color: #ff4b8b;
         border: 2px solid #ff4b8b;
         padding: 12px 26px;
+        z-index: 5;
+        transition: all 0.35s ease;
+        position: absolute;
     }
 
     .no-text {
@@ -90,16 +93,42 @@
         opacity: 0.85;
         min-height: 24px;
     }
+
+    .music-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #ffe6f2;
+        padding: 12px 18px;
+        border-radius: 25px;
+        font-size: 1.2rem;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        cursor: pointer;
+        border: 2px solid #ffb6d9;
+        transition: 0.2s;
+        user-select: none;
+        z-index: 9999;
+    }
+
+    .music-btn:hover {
+        transform: scale(1.07);
+        background: #ffd9ec;
+    }
 </style>
 </head>
 <body>
 
-<!-- Cute romantic background music -->
-<audio autoplay loop>
-    <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_7e3f3b7f3e.mp3?filename=cute-romantic-110397.mp3" type="audio/mpeg">
+<!-- Music Player -->
+<audio id="bgMusic" loop>
+    <source src="song.mp3" type="audio/mpeg">
 </audio>
 
-<div class="main-box">
+<!-- Music Button -->
+<div class="music-btn" id="musicBtn" onclick="toggleMusic()">
+    ▶️(⸝⸝ᵕᴗᵕ⸝⸝)♡
+</div>
+
+<div class="main-box" id="mainBox">
     <div class="emoji">🥺💗</div>
 
     <div class="question" id="question">My Love Will You be my Valentine?</div>
@@ -110,71 +139,128 @@
     <div class="no-text" id="funnyLine"></div>
 </div>
 
-<!-- Confetti library -->
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <script>
-    // Get name from URL
-    const params = new URLSearchParams(window.location.search);
-    const name = params.get("name") || "My Love";
-    document.getElementById("question").textContent = `${name} Will You be my Valentine?`;
+/* Name from URL */
+const params = new URLSearchParams(window.location.search);
+const name = params.get("name") || "My Love";
+document.getElementById("question").textContent = `${name} Will You be my Valentine?`;
 
-    // Funny rotating lines
-    const funnyLines = [
-        "No is a bit shy 😳",
-        "No is scared of commitment 😂",
-        "No tried to say yes but panicked 😅",
-        "No has left the chat 💀",
-        "No is unavailable at the moment 📵",
-        "No is running away from responsibility 🏃‍♂️💨",
-        "No knows it's wrong 😌",
-        "No is pretending it didn't hear the question 👀"
-    ];
+/* Funny NO lines */
+const funnyLines = [
+    "No is a bit shy 😳",
+    "No is scared of commitment 😂",
+    "No tried to say yes but panicked 😅",
+    "No has left the chat 💀",
+    "No is unavailable at the moment 📵",
+    "No is running away from responsibility 🏃‍♂️💨",
+    "No knows it's wrong 😌",
+    "No is pretending it didn't hear the question 👀"
+];
+document.getElementById("funnyLine").textContent =
+    funnyLines[Math.floor(Math.random() * funnyLines.length)];
 
-    document.getElementById("funnyLine").textContent =
-        funnyLines[Math.floor(Math.random() * funnyLines.length)];
+const noBtn = document.getElementById("noBtn");
+const yesBtn = document.getElementById("yesBtn");
+const mainBox = document.getElementById("mainBox");
 
-    // Moving NO button
-    const noBtn = document.getElementById("noBtn");
-    noBtn.addEventListener("mouseover", () => {
-        const x = Math.random() * (window.innerWidth - 150);
-        const y = Math.random() * (window.innerHeight - 150);
-        noBtn.style.position = "absolute";
-        noBtn.style.left = x + "px";
-        noBtn.style.top = y + "px";
+let noScale = 1;
+
+/* Helper functions */
+function rect(x, y, w, h) {
+    return { left: x, right: x + w, top: y, bottom: y + h };
+}
+
+function overlaps(a, b) {
+    return !(a.right < b.left || a.left > b.right || a.bottom < b.top || a.top > b.bottom);
+}
+
+/* NO button movement — stays inside white box */
+noBtn.addEventListener("mouseover", () => {
+    const padding = 10;
+
+    const boxRect = mainBox.getBoundingClientRect();
+    const yesRect = yesBtn.getBoundingClientRect();
+
+    const noW = noBtn.offsetWidth;
+    const noH = noBtn.offsetHeight;
+
+    let x, y, tries = 0;
+
+    while (tries < 500) {
+        x = boxRect.left + Math.random() * (boxRect.width - noW - padding);
+        y = boxRect.top + Math.random() * (boxRect.height - noH - padding);
+
+        const noRect = rect(x, y, noW, noH);
+
+        if (!overlaps(noRect, yesRect)) break;
+
+        tries++;
+    }
+
+    noBtn.style.left = x + "px";
+    noBtn.style.top = y + "px";
+
+    /* Shrink NO button */
+    noScale -= 0.05;
+    if (noScale < 0.5) noScale = 0.5;
+    noBtn.style.transform = `scale(${noScale})`;
+});
+
+/* NO click */
+noBtn.onclick = () => {
+    alert("Wow. Rejected. My heart just filed a complaint.");
+};
+
+/* YES button */
+yesBtn.onclick = () => {
+    confetti({
+        particleCount: 200,
+        spread: 90,
+        origin: { y: 0.6 }
     });
 
-    // Sarcastic message if they somehow click NO
-    noBtn.onclick = () => {
-        alert("Wow. Rejected. My heart just filed a complaint.");
-    };
+    setTimeout(() => {
+        window.location.href = "yes.html?name=" + encodeURIComponent(name);
+    }, 800);
+};
 
-    // YES button → confetti + go to next page
-    document.getElementById("yesBtn").onclick = () => {
-        confetti({
-            particleCount: 200,
-            spread: 90,
-            origin: { y: 0.6 }
-        });
+/* Floating hearts */
+function createHeart() {
+    const heart = document.createElement("div");
+    heart.className = "heart";
+    heart.textContent = "❤️";
+    heart.style.left = Math.random() * 100 + "vw";
+    heart.style.bottom = "-20px";
+    heart.style.fontSize = (20 + Math.random() * 20) + "px";
+    document.body.appendChild(heart);
 
-        setTimeout(() => {
-            window.location.href = "yes.html?name=" + encodeURIComponent(name);
-        }, 800);
-    };
+    setTimeout(() => heart.remove(), 6000);
+}
+setInterval(createHeart, 500);
 
-    // Floating hearts
-    function createHeart() {
-        const heart = document.createElement("div");
-        heart.className = "heart";
-        heart.textContent = "❤️";
-        heart.style.left = Math.random() * 100 + "vw";
-        heart.style.bottom = "-20px";
-        heart.style.fontSize = (20 + Math.random() * 20) + "px";
-        document.body.appendChild(heart);
+/* Music logic */
+const music = document.getElementById("bgMusic");
 
-        setTimeout(() => heart.remove(), 6000);
+function toggleMusic() {
+    if (music.paused) {
+        music.play();
+        localStorage.setItem("music", "on");
+        musicBtn.textContent = "⏸️(⸝⸝ᵕᴗᵕ⸝⸝)♡";
+    } else {
+        music.pause();
+        localStorage.setItem("music", "off");
+        musicBtn.textContent = "▶️(⸝⸝ᵕᴗᵕ⸝⸝)♡";
     }
-    setInterval(createHeart, 500);
+}
+
+/* Save timestamp */
+setInterval(() => {
+    if (!music.paused) {
+        localStorage.setItem("musicTime", music.currentTime);
+    }
+}, 300);
 </script>
 
 </body>
