@@ -1,37 +1,184 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport"content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>For You </title>
-<style>body {    margin: 0;    min-height: 100vh;    background: linear-gradient(135deg, #ff758c, #ff7eb3);    display: flex;    justify-content: center;    align-items: center;    font-family: 'Segoe UI', sans-serif;    overflow: hidden;}
-.container {    background: white;    padding: 24px;    border-radius: 22px;    text-align: center;    width: 92%;    max-width: 380px;    box-shadow: 0 15px 30px rgba(0,0,0,0.3);    position: relative;}
-/* Pages */.page {    display: none;}.page.active {    display: block;}
-/* Text */h1 {    color: #ff4d6d;    min-height: 60px;    font-size: 22px;}
-/* Countdown */#countdown {    font-size: 14px;    color: #555;    margin-bottom: 10px;}
-/* Buttons */button {    padding: 14px 28px;    font-size: 18px;    border: none;    border-radius: 30px;    margin: 10px 0;    cursor: pointer;    width: 85%;}
-#yes {    background: #ff4d6d;    color: white;}
-#no {    background: #ccc;    position: absolute;    transition: transform 0.15s ease;}
-/* Proposal image (ONLY page 2) */#proposalImage {    width: 100%;    max-width: 280px;    margin-top: 15px;    border-radius: 18px;    animation: pop 0.8s ease;}
-@keyframes pop {    from { transform: scale(0.7); opacity: 0; }    to { transform: scale(1); opacity: 1; }}
-/* Hearts */.heart {    position: fixed;    font-size: 24px;    animation: floatUp 3s linear forwards;    z-index: 1;}
-@keyframes floatUp {    from { transform: translateY(0); opacity: 1; }    to { transform: translateY(-600px); opacity: 0; }}</style></head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Be My Valentine</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+    body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: url('https://i.imgur.com/5cZpQ0y.png');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        font-family: "Poppins", sans-serif;
+        overflow: hidden;
+    }
+
+    /* Floating hearts */
+    .heart {
+        position: fixed;
+        color: rgba(255, 0, 76, 0.4);
+        animation: floatUp 6s linear infinite;
+        pointer-events: none;
+    }
+
+    @keyframes floatUp {
+        0% { transform: translateY(0) scale(1); opacity: 1; }
+        100% { transform: translateY(-120vh) scale(1.6); opacity: 0; }
+    }
+
+    /* Main box */
+    .main-box {
+        background: white;
+        padding: 45px 55px;
+        border-radius: 25px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.18);
+        text-align: center;
+        max-width: 95%;
+    }
+
+    .emoji {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+    }
+
+    .question {
+        font-size: 1.8rem;
+        color: #b30044;
+        margin-bottom: 35px;
+    }
+
+    .btn {
+        padding: 14px 34px;
+        font-size: 1.2rem;
+        border-radius: 30px;
+        border: none;
+        cursor: pointer;
+        margin: 10px;
+        transition: 0.2s;
+        position: relative;
+    }
+
+    /* YES button with bouncing animation */
+    #yesBtn {
+        background: #ff4b8b;
+        color: white;
+        font-size: 1.5rem;
+        padding: 18px 45px;
+        box-shadow: 0 6px 20px rgba(255, 75, 139, 0.4);
+        animation: bounce 1.2s infinite ease-in-out;
+    }
+
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-6px); }
+    }
+
+    #noBtn {
+        background: white;
+        color: #ff4b8b;
+        border: 2px solid #ff4b8b;
+        padding: 12px 26px;
+    }
+
+    .no-text {
+        margin-top: 10px;
+        font-size: 1rem;
+        color: #b30044;
+        opacity: 0.85;
+        min-height: 24px;
+    }
+</style>
+</head>
 <body>
-<!-- Audio --><audio id="bgMusic" loop>  <source src="https://www.bensound.com/bensound-music/bensound-romantic.mp3"></audio>
-<audio id="screamSound">  <source src="https://www.soundjay.com/human/sounds/scream-01.mp3"></audio>
-<div class="container">
-  <!-- PAGE 1 : QUESTION -->  <div class="page active" id="page-question">    <div id="countdown"></div>    <h1 id="questionText"></h1>
-    <button id="yes">Yes </button>    <button id="no">No </button>  </div>
-  <!-- PAGE 2 : PROPOSAL (IMAGE IS HERE ONLY) -->  <div class="page" id="page-proposal">    <h1 id="proposalText"></h1>
-    <!-- IMAGE ONLY APPEARS AFTER YES -->    <img id="proposalImage" src="proposal.png" alt="Proposal">
-    <p style="margin-top:10px;">      You just made me the happiest person alive     </p>  </div>
+
+<!-- Cute romantic background music -->
+<audio autoplay loop>
+    <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_7e3f3b7f3e.mp3?filename=cute-romantic-110397.mp3" type="audio/mpeg">
+</audio>
+
+<div class="main-box">
+    <div class="emoji">(⸝⸝ᵕᴗᵕ⸝⸝)♡</div>
+
+    <div class="question" id="question">My Love Will You be my Valentine?</div>
+
+    <button id="yesBtn" class="btn">Yes</button>
+    <button id="noBtn" class="btn">No</button>
+
+    <div class="no-text" id="funnyLine"></div>
 </div>
-<script>/* Name from URL */const params = new URLSearchParams(window.location.search);const herName = params.get("name") || "My Love";
-/* Typing question */const question = `Hey ${herName}... Will you be my Valentine? `;let i = 0;function typeQuestion() {    if (i < question.length) {        document.getElementById("questionText").innerHTML += question.charAt(i++);        setTimeout(typeQuestion, 55);    }}typeQuestion();
-/* Countdown */const countdownEl = document.getElementById("countdown");const valentinesDay = new Date(new Date().getFullYear(), 1, 14);
-function updateCountdown() {    const diff = valentinesDay - new Date();    if (diff <= 0) {        countdownEl.innerHTML = " It's Valentine’s Day! ";        return;    }    const d = Math.floor(diff / 86400000);    const h = Math.floor((diff / 3600000) % 24);    const m = Math.floor((diff / 60000) % 60);    const s = Math.floor((diff / 1000) % 60);    countdownEl.innerHTML = ` ${d}d ${h}h ${m}m ${s}s left`;}setInterval(updateCountdown, 1000);updateCountdown();
-/* Start music on first interaction */let musicStarted = false;document.addEventListener("pointerdown", () => {    if (!musicStarted) {        document.getElementById("bgMusic").play().catch(()=>{});        musicStarted = true;    }}, { once:true });
-/* Magnet NO button */const noBtn = document.getElementById("no");const screamSound = document.getElementById("screamSound");const screams = ["WAIT ","NOOO ","HEY ","PLEASE "];
-document.addEventListener("mousemove", magnet);document.addEventListener("touchmove", magnet, { passive:false });
-function magnet(e) {    const r = noBtn.getBoundingClientRect();    const px = e.touches ? e.touches[0].clientX : e.clientX;    const py = e.touches ? e.touches[0].clientY : e.clientY;    const dx = (r.left + r.width/2) - px;    const dy = (r.top + r.height/2) - py;    const dist = Math.hypot(dx, dy);
-    if (dist < 120) {        noBtn.style.transform = `translate(${dx*0.6}px,${dy*0.6}px)`;    }    if (dist < 60) {        screamSound.currentTime = 0;        screamSound.play();        noBtn.innerText = screams[Math.floor(Math.random()*screams.length)];        noBtn.style.transform = "translate(0,0)";        noBtn.style.left = Math.random()*(window.innerWidth-140)+"px";        noBtn.style.top = Math.random()*(window.innerHeight-140)+"px";    }}
-/* YES → SHOW PAGE 2 + IMAGE */document.getElementById("yes").onclick = () => {    document.getElementById("page-question").classList.remove("active");    document.getElementById("page-proposal").classList.add("active");
-    document.getElementById("proposalText").innerText =        ` ${herName.toUpperCase()} SAID YES!!! `;
-    launchHearts();};
-/* Hearts */function launchHearts() {    for (let i=0;i<40;i++) {        const h = document.createElement("div");        h.className = "heart";        h.innerText = " ";        h.style.left = Math.random()*window.innerWidth+"px";        h.style.bottom = "0";        document.body.appendChild(h);        setTimeout(()=>h.remove(),3000);    }}</script>
-</body></html>
+
+<!-- Confetti library -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<script>
+    // Get name from URL
+    const params = new URLSearchParams(window.location.search);
+    const name = params.get("name") || "My Love";
+    document.getElementById("question").textContent = `${name} Will You be my Valentine?`;
+
+    // Funny rotating lines
+    const funnyLines = [
+        "No is a bit shy 😳",
+        "No is scared of commitment 😂",
+        "No tried to say yes but panicked 😅",
+        "No has left the chat 💀",
+        "No is unavailable at the moment 📵",
+        "No is running away from responsibility 🏃‍♂️💨",
+        "No knows it's wrong 😌",
+        "No is pretending it didn't hear the question 👀"
+    ];
+
+    document.getElementById("funnyLine").textContent =
+        funnyLines[Math.floor(Math.random() * funnyLines.length)];
+
+    // Moving NO button
+    const noBtn = document.getElementById("noBtn");
+    noBtn.addEventListener("mouseover", () => {
+        const x = Math.random() * (window.innerWidth - 150);
+        const y = Math.random() * (window.innerHeight - 150);
+        noBtn.style.position = "absolute";
+        noBtn.style.left = x + "px";
+        noBtn.style.top = y + "px";
+    });
+
+    // Sarcastic message if they somehow click NO
+    noBtn.onclick = () => {
+        alert("Wow. Rejected. My heart just filed a complaint.");
+    };
+
+    // YES button → confetti + go to next page
+    document.getElementById("yesBtn").onclick = () => {
+        confetti({
+            particleCount: 200,
+            spread: 90,
+            origin: { y: 0.6 }
+        });
+
+        setTimeout(() => {
+            window.location.href = "yes.html?name=" + encodeURIComponent(name);
+        }, 800);
+    };
+
+    // Floating hearts
+    function createHeart() {
+        const heart = document.createElement("div");
+        heart.className = "heart";
+        heart.textContent = "❤️";
+        heart.style.left = Math.random() * 100 + "vw";
+        heart.style.bottom = "-20px";
+        heart.style.fontSize = (20 + Math.random() * 20) + "px";
+        document.body.appendChild(heart);
+
+        setTimeout(() => heart.remove(), 6000);
+    }
+    setInterval(createHeart, 500);
+</script>
+
+</body>
+</html>
