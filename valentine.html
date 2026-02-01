@@ -30,7 +30,7 @@
 
     .main-box {
         background: white;
-        padding: 60px 70px; /* increased size */
+        padding: 60px 70px;
         border-radius: 25px;
         box-shadow: 0 8px 25px rgba(0,0,0,0.18);
         text-align: center;
@@ -176,7 +176,7 @@ function overlaps(a, b) {
     return !(a.right < b.left || a.left > b.right || a.bottom < b.top || a.top > b.bottom);
 }
 
-/* NO button movement — stays inside white box */
+/* NO button movement — stays inside white box ONLY */
 noBtn.addEventListener("mouseover", () => {
     const padding = 10;
 
@@ -189,16 +189,26 @@ noBtn.addEventListener("mouseover", () => {
     let x, y, tries = 0;
 
     while (tries < 500) {
-        x = boxRect.left + Math.random() * (boxRect.width - noW - padding);
-        y = boxRect.top + Math.random() * (boxRect.height - noH - padding);
 
-        const noRect = rect(x, y, noW, noH);
+        /* IMPORTANT: Position relative to the BOX, not the screen */
+        x = Math.random() * (boxRect.width - noW - padding);
+        y = Math.random() * (boxRect.height - noH - padding);
 
+        /* Convert NO's future position to SCREEN coordinates for collision check */
+        const noRect = {
+            left: boxRect.left + x,
+            right: boxRect.left + x + noW,
+            top: boxRect.top + y,
+            bottom: boxRect.top + y + noH
+        };
+
+        /* Must NOT overlap YES button */
         if (!overlaps(noRect, yesRect)) break;
 
         tries++;
     }
 
+    /* Apply movement relative to the box */
     noBtn.style.left = x + "px";
     noBtn.style.top = y + "px";
 
@@ -207,7 +217,6 @@ noBtn.addEventListener("mouseover", () => {
     if (noScale < 0.5) noScale = 0.5;
     noBtn.style.transform = `scale(${noScale})`;
 });
-
 /* NO click */
 noBtn.onclick = () => {
     alert("Wow. Rejected. My heart just filed a complaint.");
