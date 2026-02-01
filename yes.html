@@ -41,7 +41,6 @@
         box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     }
 
-    /* Floating hearts */
     .heart {
         position: fixed;
         color: rgba(255, 0, 76, 0.4);
@@ -54,7 +53,6 @@
         100% { transform: translateY(-120vh) scale(1.6); opacity: 0; }
     }
 
-    /* Fade-in personalized message */
     .message {
         margin-top: 25px;
         font-size: 1.4rem;
@@ -68,35 +66,47 @@
         from { opacity: 0; transform: translateY(10px); }
         to { opacity: 1; transform: translateY(0); }
     }
+
+    .music-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #ffe6f2;
+        padding: 12px 18px;
+        border-radius: 25px;
+        font-size: 1.2rem;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        cursor: pointer;
+        border: 2px solid #ffb6d9;
+        transition: 0.2s;
+        user-select: none;
+        z-index: 9999;
+    }
+
+    .music-btn:hover {
+        transform: scale(1.07);
+        background: #ffd9ec;
+    }
 </style>
 </head>
 <body>
-
-<!-- Cute romantic background music -->
-<audio autoplay loop>
-    <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_7e3f3b7f3e.mp3?filename=cute-romantic-110397.mp3" type="audio/mpeg">
-</audio>
 
 <h1>YAYYYYYYY!</h1>
 <div class="hearts">❤️💖💕💗💞</div>
 
 <img src="proposal.png" alt="Our Ghibli Moment">
 
-<!-- Personalized fade-in message -->
 <div id="personalMessage" class="message"></div>
 
-<!-- Confetti -->
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <script>
-    // Confetti burst on load
     confetti({
         particleCount: 250,
         spread: 100,
         origin: { y: 0.6 }
     });
 
-    // Floating hearts
     function createHeart() {
         const heart = document.createElement("div");
         heart.className = "heart";
@@ -110,11 +120,65 @@
     }
     setInterval(createHeart, 500);
 
-    // Personalized fade-in message
     const params = new URLSearchParams(window.location.search);
     const name = params.get("name") || "My Love";
     document.getElementById("personalMessage").textContent =
-        `${name}, You will be always loved baccha ❤️`;
+        `${name}, you will be always loved baccha ❤️`;
+</script>
+
+<!-- Music Player -->
+<audio id="bgMusic" loop>
+    <source src="song.mp3" type="audio/mpeg">
+</audio>
+
+<!-- Music Button -->
+<div class="music-btn" id="musicBtn" onclick="toggleMusic()">
+    ▶️(⸝⸝ᵕᴗᵕ⸝⸝)♡
+</div>
+
+<script>
+    const music = document.getElementById("bgMusic");
+    const musicBtn = document.getElementById("musicBtn");
+
+    /* Restore timestamp */
+    const savedTime = parseFloat(localStorage.getItem("musicTime")) || 0;
+    music.currentTime = savedTime;
+
+    /* Restore icon + prepare auto-resume */
+    const shouldPlay = localStorage.getItem("music") === "on";
+
+    if (shouldPlay) {
+        musicBtn.textContent = "⏸️(⸝⸝ᵕᴗᵕ⸝⸝)♡";
+
+        // Browser requires a user gesture → resume on first click
+        const resume = () => {
+            music.play();
+            document.removeEventListener("click", resume);
+        };
+        document.addEventListener("click", resume);
+    } else {
+        musicBtn.textContent = "▶️(⸝⸝ᵕᴗᵕ⸝⸝)♡";
+    }
+
+    /* Toggle music */
+    function toggleMusic() {
+        if (music.paused) {
+            music.play();
+            localStorage.setItem("music", "on");
+            musicBtn.textContent = "⏸️(⸝⸝ᵕᴗᵕ⸝⸝)♡";
+        } else {
+            music.pause();
+            localStorage.setItem("music", "off");
+            musicBtn.textContent = "▶️(⸝⸝ᵕᴗᵕ⸝⸝)♡";
+        }
+    }
+
+    /* Save timestamp every 300ms */
+    setInterval(() => {
+        if (!music.paused) {
+            localStorage.setItem("musicTime", music.currentTime);
+        }
+    }, 300);
 </script>
 
 </body>
