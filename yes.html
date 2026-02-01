@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>YAY!</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background: url('https://i.imgur.com/5cZpQ0y.png');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        font-family: "Poppins", sans-serif;
+        text-align: center;
+        overflow: hidden;
+    }
+
+    h1 {
+        margin-top: 40px;
+        color: #b30044;
+        font-size: 2.4rem;
+        font-weight: 700;
+        text-shadow: 0 2px 4px rgba(255,255,255,0.6);
+    }
+
+    .hearts {
+        font-size: 2rem;
+        margin-top: 20px;
+        animation: float 2s infinite ease-in-out;
+    }
+
+    @keyframes float {
+        0% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+        100% { transform: translateY(0); }
+    }
+
+    img {
+        margin-top: 30px;
+        width: 80%;
+        max-width: 420px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    /* Floating hearts */
+    .heart {
+        position: fixed;
+        color: rgba(255, 0, 76, 0.4);
+        animation: floatUp 6s linear infinite;
+        pointer-events: none;
+    }
+
+    @keyframes floatUp {
+        0% { transform: translateY(0) scale(1); opacity: 1; }
+        100% { transform: translateY(-120vh) scale(1.6); opacity: 0; }
+    }
+
+    /* Fade-in personalized message */
+    .message {
+        margin-top: 25px;
+        font-size: 1.4rem;
+        color: #b30044;
+        font-weight: 600;
+        opacity: 0;
+        animation: fadeIn 2s forwards ease-in-out;
+        text-shadow: 0 1px 3px rgba(255,255,255,0.7);
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+</head>
+<body>
+
+<!-- Cute romantic background music -->
+<audio autoplay loop>
+    <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_7e3f3b7f3e.mp3?filename=cute-romantic-110397.mp3" type="audio/mpeg">
+</audio>
+
+<h1>YAYYYYYYY!</h1>
+<div class="hearts">❤️💖💕💗💞</div>
+
+<img src="proposal.png" alt="Our Ghibli Moment">
+
+<!-- Personalized fade-in message -->
+<div id="personalMessage" class="message"></div>
+
+<!-- Confetti -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<script>
+    // Confetti burst on load
+    confetti({
+        particleCount: 250,
+        spread: 100,
+        origin: { y: 0.6 }
+    });
+
+    // Floating hearts
+    function createHeart() {
+        const heart = document.createElement("div");
+        heart.className = "heart";
+        heart.textContent = "❤️";
+        heart.style.left = Math.random() * 100 + "vw";
+        heart.style.bottom = "-20px";
+        heart.style.fontSize = (20 + Math.random() * 20) + "px";
+        document.body.appendChild(heart);
+
+        setTimeout(() => heart.remove(), 6000);
+    }
+    setInterval(createHeart, 500);
+
+    // Personalized fade-in message
+    const params = new URLSearchParams(window.location.search);
+    const name = params.get("name") || "My Love";
+    document.getElementById("personalMessage").textContent =
+        `${name}, You will be always loved baccha ❤️`;
+</script>
+
+</body>
+</html>
