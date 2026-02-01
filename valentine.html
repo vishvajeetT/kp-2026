@@ -1,0 +1,36 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport"content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>For You </title>
+<style>body {    margin: 0;    min-height: 100vh;    background: linear-gradient(135deg, #ff758c, #ff7eb3);    display: flex;    justify-content: center;    align-items: center;    font-family: 'Segoe UI', sans-serif;    overflow: hidden;}
+.container {    background: white;    padding: 22px;    border-radius: 22px;    text-align: center;    width: 92%;    max-width: 380px;    box-shadow: 0 15px 30px rgba(0,0,0,0.3);    position: relative;    z-index: 2;}
+h1 {    color: #ff4d6d;    min-height: 65px;    font-size: 22px;}
+#countdown {    font-size: 14px;    color: #555;    margin-bottom: 10px;}
+button {    padding: 14px 28px;    font-size: 18px;    border: none;    border-radius: 30px;    margin: 10px 0;    cursor: pointer;    width: 85%;}
+#yes {    background: #ff4d6d;    color: white;}
+#no {    background: #ccc;    position: absolute;    transition: transform 0.15s ease;}
+img {    width: 100%;    max-width: 260px;    margin-top: 15px;    display: none;    border-radius: 18px;    animation: pop 0.8s ease;}
+@keyframes pop {    from { transform: scale(0.7); opacity: 0; }    to { transform: scale(1); opacity: 1; }}
+/* Popup */.popup {    display: none;    position: fixed;    inset: 0;    background: rgba(0,0,0,0.75);    justify-content: center;    align-items: center;    z-index: 3;}
+.popup div {    background: white;    padding: 25px;    border-radius: 20px;    text-align: center;}
+/* Hearts */.heart {    position: fixed;    font-size: 24px;    animation: floatUp 3s linear forwards;    z-index: 1;}
+@keyframes floatUp {    from { transform: translateY(0); opacity: 1; }    to { transform: translateY(-600px); opacity: 0; }}</style></head>
+<body>
+<!-- Audio --><audio id="bgMusic" loop>  <source src="https://www.bensound.com/bensound-music/bensound-romantic.mp3" type="audio/mp3"></audio>
+<audio id="screamSound">  <source src="https://www.soundjay.com/human/sounds/scream-01.mp3" type="audio/mp3"></audio>
+<div class="container" id="container">    <div id="countdown"></div>    <h1 id="text"></h1>
+    <button id="yes">Yes </button>    <button id="no">No </button>
+    <img id="proposal" src="proposal.png" alt="Proposal"></div>
+<div class="popup" id="popup">  <div>    <h2 id="popupText"> SHE SAID YES!!! </h2>    <p>You just made me the happiest person alive </p>    <p>I love you endlessly </p>  </div></div>
+<script>/* Name from URL */const params = new URLSearchParams(window.location.search);const herName = params.get("name") || "My Love";
+/* Typing */const textStr = `Hey ${herName}... Will you be my Valentine? `;let ti = 0;function typeText() {    if (ti < textStr.length) {        document.getElementById("text").innerHTML += textStr.charAt(ti++);        setTimeout(typeText, 55);    }}typeText();
+/* Countdown */const countdownEl = document.getElementById("countdown");const valentinesDay = new Date(new Date().getFullYear(), 1, 14);
+function updateCountdown() {    const diff = valentinesDay - new Date();    if (diff <= 0) {        countdownEl.innerHTML = " It's Valentine’s Day! ";        return;    }    const d = Math.floor(diff / 86400000);    const h = Math.floor((diff / 3600000) % 24);    const m = Math.floor((diff / 60000) % 60);    const s = Math.floor((diff / 1000) % 60);    countdownEl.innerHTML = ` ${d}d ${h}h ${m}m ${s}s left`;}setInterval(updateCountdown, 1000);updateCountdown();
+/* Start music on first interaction */let musicStarted = false;document.addEventListener("pointerdown", () => {    if (!musicStarted) {        document.getElementById("bgMusic").play().catch(()=>{});        musicStarted = true;    }}, { once: true });
+/* Haptics */function vibrate(pattern) {    if (navigator.vibrate) navigator.vibrate(pattern);    else {        document.body.style.transform = "translateX(2px)";        setTimeout(()=>document.body.style.transform="translateX(-2px)",40);        setTimeout(()=>document.body.style.transform="translateX(0)",80);    }}
+/* Magnet NO button */const noBtn = document.getElementById("no");const screamSound = document.getElementById("screamSound");const screams = ["WAIT ","NOOO ","HEY ","PLEASE "];
+function handlePointer(e) {    const r = noBtn.getBoundingClientRect();    const bx = r.left + r.width/2;    const by = r.top + r.height/2;    const px = e.clientX;    const py = e.clientY;
+    const dx = bx - px;    const dy = by - py;    const dist = Math.hypot(dx, dy);
+    if (dist < 120) {        vibrate([30]);        noBtn.style.transform = `translate(${dx*0.6}px,${dy*0.6}px)`;    }    if (dist < 60) runAway();}
+function runAway() {    vibrate([50,30,50]);    screamSound.currentTime = 0;    screamSound.play();    noBtn.innerText = screams[Math.floor(Math.random()*screams.length)];    noBtn.style.transform = "translate(0,0)";    noBtn.style.left = Math.random()*(window.innerWidth-140)+"px";    noBtn.style.top = Math.random()*(window.innerHeight-140)+"px";}
+document.addEventListener("pointermove", handlePointer);
+/* YES */document.getElementById("yes").addEventListener("click", () => {    vibrate([200,80,200]);    document.getElementById("proposal").style.display = "block";    document.getElementById("popup").style.display = "flex";    document.getElementById("popupText").innerText =        ` ${herName.toUpperCase()} SAID YES!!! `;    noBtn.style.display = "none";    launchHearts();});
+/* Hearts */function launchHearts() {    for (let i=0;i<40;i++) {        const h = document.createElement("div");        h.className="heart";        h.innerText=" ";        h.style.left=Math.random()*window.innerWidth+"px";        h.style.bottom="0";        document.body.appendChild(h);        setTimeout(()=>h.remove(),3000);    }}</script>
+</body></html>
